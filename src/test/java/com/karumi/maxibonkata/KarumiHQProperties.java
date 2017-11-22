@@ -9,16 +9,18 @@ import org.junit.runner.RunWith;
 import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 @RunWith(JUnitQuickcheck.class)
 public class KarumiHQProperties {
 
     private KarumiHQs karumiHQs;
+    private Chat chatMocked;
 
     @Before
     public void setUp(){
-        karumiHQs = new KarumiHQs(mock(Chat.class));
+        chatMocked = mock(Chat.class);
+        karumiHQs = new KarumiHQs(chatMocked);
     }
 
     @Property public void theFridgeShouldNeverHaveLessThanTwoMaxiBonsAfterDeveloperEats(@From(DevelopersGenerator.class) Developer developer) {
@@ -99,5 +101,13 @@ public class KarumiHQProperties {
         System.out.println("Fridge.leftAfterEat = " + karumiHQs.getMaxibonsLeft() + "\n");
 
         assertTrue(numMaxibonExpected == karumiHQs.getMaxibonsLeft());
+    }
+
+
+    @Property public void shouldSendMessageWhenFridgeHasLessThanTwoMaxibons(@From(DevelopersGenerator.class) Developer developer){
+
+        karumiHQs.openFridge(developer);
+
+        verify(chatMocked,times(1)).sendMessage("Hi guys, I'm " + developer.getName() + ". We need more maxibons!");
     }
 }
